@@ -1,0 +1,49 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "OnePeek Community",
+  "version": "1.1.3",
+  "identifier": "io.github.onepeek.community",
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "devUrl": "http://localhost:1420",
+    "beforeBuildCommand": "npm run build",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "label": "main",
+        "title": "OnePeek Community",
+        "width": 1240,
+        "height": 840,
+        "minWidth": 720,
+        "minHeight": 520,
+        "resizable": true,
+        "center": true,
+        "dragDropEnabled": true
+      }
+    ],
+    "security": {
+      "csp": null,
+      "assetProtocol": {
+        "enable": true,
+        "scope": [
+          "**"
+        ]
+      }
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "publisher": "OnePeek Contributors",
+    "copyright": "Copyright © 2026 OnePeek Contributors. Licensed under GNU GPLv3.",
+    "shortDescription": "OnePeek Community — Open-Source Fast Offline File Viewer",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.ico"
+    ]
+  }
+}

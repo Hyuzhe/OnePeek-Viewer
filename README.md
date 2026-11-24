@@ -2,33 +2,81 @@
 
 <img src="assets/og-cover.png" alt="OnePeek Universal File Viewer Cover" width="760" />
 
-# OnePeek — Offline Universal File Viewer
+# OnePeek — Open-Core Universal File Viewer & Windows QuickLook
 
-**Open 120+ file formats offline on Windows & Android — CAD, 3D STEP/STL, CDR/PSD/AI, DICOM/NIfTI, CAJ, PDF, E-books & Office.**
+**Open 120+ file formats offline on Windows & Android. Build the GPLv3 Community Edition from source with Windows Spacebar QuickLook, or download OnePeek Pro for CAD, 3D STEP/STL, CDR/PSD/AI, DICOM/NIfTI, CAJ, eBooks & Office.**
 
 [Website](https://onepeek.top/) · [简体中文](README.zh-CN.md) · [Latest Release (v1.1.3)](https://github.com/Hyuzhe/OnePeek-Viewer/releases/tag/v1.1.3) · [Report a Bug](https://github.com/Hyuzhe/OnePeek-Viewer/issues/new?template=bug_report.md) · [Request a Format](https://github.com/Hyuzhe/OnePeek-Viewer/issues/new?template=format_request.md)
 
+[![CI](https://github.com/Hyuzhe/OnePeek-Viewer/actions/workflows/ci.yml/badge.svg)](https://github.com/Hyuzhe/OnePeek-Viewer/actions/workflows/ci.yml)
+![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)
 ![Platform](https://img.shields.io/badge/Platform-Windows%20x64%20%7C%20Android-0ea5e9)
 ![Version](https://img.shields.io/badge/Version-v1.1.3-10b981)
-![Offline](https://img.shields.io/badge/Privacy-100%25%20Offline%20%26%20Local-6366f1)
+![Privacy](https://img.shields.io/badge/Privacy-100%25%20Offline%20%26%20Local-6366f1)
 ![Formats](https://img.shields.io/badge/Formats-120%2B-f59e0b)
 
 </div>
 
-> **Repository Notice:** This public repository hosts OnePeek's official documentation, showcase, verified release links, and public issue tracker. OnePeek is commercial proprietary software; application source code is maintained privately.
+> **Open-Core Model:** This repository contains the full, buildable source code for **OnePeek Community** (Tauri 2 + Rust shell, native Windows Explorer Spacebar QuickLook daemon, and core built-in viewers) licensed under **GNU GPLv3**. Specialized commercial engines for Pro formats (CAD, 3D models, CorelDRAW/PSD/AI, DICOM/NIfTI, CAJ, Office, and e-books) remain proprietary in pre-built **OnePeek Pro** releases.
 
 ---
 
-## Why OnePeek?
+## Community Edition (GPLv3) vs OnePeek Pro
 
-- **100% Local & Offline:** Files stay strictly on your device — zero cloud uploads, no account required to view files.
-- **Portable & Lightweight (~15 MB):** Runs cleanly without installing heavy 10 GB+ CAD/design suites just to inspect a drawing or model.
-- **120+ Engineering, Design, Medical, Academic & Document Formats:** One unified viewer across Windows x64 and Android.
-- **Quick Inspection Built In:** Smooth zooming, layer/structure inspection, 3D orbit controls, slice navigation, and fast document rendering.
+| Capability / Format | OnePeek Community (`GPL-3.0-only`, This Repo) | OnePeek Pro (Commercial Release) |
+| --- | :---: | :---: |
+| **Tauri 2 + Rust Shell & Dark/Light Themes (6 Palettes)** | Included | Included |
+| **Windows Explorer Spacebar QuickLook (`quicklook_daemon.rs` + `shell_explorer.rs`)** | Included | Included |
+| **Images & Vector SVG (`JPG`, `PNG`, `WebP`, `GIF`, `SVG`, `AVIF`) + PNG Export** | Included | Included |
+| **PDF Reader (`pdfjs-dist`) + HiDPI PNG Export** | Included | Included |
+| **Local HTML/XHTML Sandbox (`html_engine.rs`)** | Included | Included |
+| **Markdown & 35+ Code Languages (`fs_service.rs`, GBK/UTF-8 Auto-Detect)** | Included | Included |
+| **Archives (`ZIP`, `7Z`, `RAR`, `TAR`, `TAR.GZ`) & Range-Streaming Media (`MP4`, `MKV`, `MP3`, `FLAC`)** | Included | Included |
+| **Network Stack** | **Zero HTTP/network crates** | Optional online license check & updater |
+| **2D / 3D CAD (`DWG`, `DXF`, `STEP/STP`, `IGES/IGS`, `STL`, `3MF`, `GLB`)** | — (Prompts Pro) | Included |
+| **Design & Vector (`CDR/CMX`, `PSD/PSB`, `AI`)** | — (Prompts Pro) | Included |
+| **Medical Imaging (`DICOM/DCM`, `NIfTI .nii/.nii.gz`, `NRRD`, MPR + 3D)** | — (Prompts Pro) | Included |
+| **Academic & Office (`CAJ/KDH/NH`, `EPUB/MOBI/AZW3`, `DOCX`, `XLSX`, `PPTX`)** | — (Prompts Pro) | Included |
 
 ---
 
-## Real In-App Screenshots
+## Architecture Highlights (Auditable Community Source)
+
+- **100% Air-Gapped by Dependency Graph:** Inspect [`src-tauri/Cargo.toml`](src-tauri/Cargo.toml) and [`src/services/fileBridge.ts`](src/services/fileBridge.ts) — Community Edition compiles with **zero HTTP/network client crates** and zero `fetch()` calls.
+- **Native Windows Explorer QuickLook COM Integration:** [`src-tauri/src/quicklook_daemon.rs`](src-tauri/src/quicklook_daemon.rs) and [`src-tauri/src/shell_explorer.rs`](src-tauri/src/shell_explorer.rs) query the active Explorer `IShellWindows` / Desktop `ShellFolderView` selection natively via Win32 COM when Spacebar is pressed, without injecting DLL hooks into `explorer.exe`.
+- **Token-Gated Local Range Media Server & Zip/7z/RAR Engine:** [`src-tauri/src/media_server.rs`](src-tauri/src/media_server.rs) streams local video/audio over `127.0.0.1` with ephemeral tokens, while [`src-tauri/src/archive_service.rs`](src-tauri/src/archive_service.rs) supports instant nested browsing inside `ZIP`, `7Z`, `RAR`, and `TAR` archives.
+
+---
+
+## Build Community Edition from Source
+
+### Prerequisites
+- **Node.js 20+** and **npm**
+- **Rust 1.89+** (`rustup`)
+- On Windows: Visual Studio C++ Build Tools + WebView2 Runtime (built into Windows 10/11)
+
+### Commands
+
+```bash
+git clone https://github.com/Hyuzhe/OnePeek-Viewer.git
+cd OnePeek-Viewer
+npm install
+
+# Launch desktop Community Edition in dev mode
+npm run tauri dev
+
+# Build production Community desktop binary
+npm run build
+npm run tauri build
+
+# Run Rust unit tests (encoding, companion lookup, HTML sandbox, archive extraction, autostart, media streaming)
+cd src-tauri
+cargo test
+```
+
+---
+
+## Real In-App Screenshots (OnePeek Pro)
 
 <table>
   <tr>
@@ -74,7 +122,7 @@ Explore detailed format guides on **[onepeek.top](https://onepeek.top/)**:
 
 ---
 
-## Download & Checksums (v1.1.3)
+## Pre-Built Binary Downloads & Checksums (v1.1.3)
 
 | Platform | Package | Size | Direct Download | SHA-256 |
 | --- | --- | --- | --- | --- |
@@ -83,14 +131,14 @@ Explore detailed format guides on **[onepeek.top](https://onepeek.top/)**:
 
 ### WinGet (Windows Package Manager)
 
-A package submission for `OnePeek.OnePeek` (1.1.3) has been opened at [microsoft/winget-pkgs#487893](https://github.com/microsoft/winget-pkgs/pull/487893). Once merged, you will be able to install via `winget install OnePeek.OnePeek`.
+A package submission for `OnePeek.OnePeek` (1.1.3) is open at [microsoft/winget-pkgs#487893](https://github.com/microsoft/winget-pkgs/pull/487893). Once merged, you can install via `winget install OnePeek.OnePeek`.
 
 ---
 
 ## Pricing & Licensing
 
-- **One-time purchase (no subscription):** Personal & multi-seat commercial tiers from **$19** to **$79** on [onepeek.top](https://onepeek.top/).
-- **China region pricing:** **$10** to **$49** (approx. ¥70+) with Alipay support on [onepeek.top/zh/](https://onepeek.top/zh/).
+- **OnePeek Community Edition (this repository):** Free and open source under the **GNU General Public License v3.0 (`GPL-3.0-only`)**. See [`LICENSE`](LICENSE).
+- **OnePeek Pro Edition (commercial binary releases):** One-time purchase (no recurring subscription) from **\$19** to **\$79** on [onepeek.top](https://onepeek.top/), with regional China pricing **\$10** to **\$49** (approx. ¥70+) via Alipay on [onepeek.top/zh/](https://onepeek.top/zh/). Dual licensing applies: Pro commercial engines and pre-built binaries remain proprietary under commercial terms.
 
 ---
 

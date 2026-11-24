@@ -1,0 +1,38 @@
+name: Community CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-test:
+    name: Build & Test (Windows)
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install frontend dependencies
+        run: npm install
+
+      - name: Typecheck and build frontend
+        run: npm run build
+
+      - name: Setup Rust stable toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Verify Rust crates compile cleanly
+        working-directory: src-tauri
+        run: cargo check
+
+      - name: Run Rust unit tests
+        working-directory: src-tauri
+        run: cargo test
